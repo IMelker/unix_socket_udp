@@ -42,12 +42,16 @@ void UnixClient::Loop() {
 }
 
 void UnixClient::Send(const std::string& message) {
-    const char* ptr = message.c_str();
-    unsigned long int nsize = message.length();
-    int nwritten;
+  const char* ptr = message.c_str();
+  unsigned long int nsize = message.length();
+  int nwritten;
 
-    if ((nwritten = sendto(client_, ptr, nsize, 0, (struct sockaddr *) &server_addr_, sizeof(struct sockaddr_un))) != nsize) {
-      perror("Can't write down to socket.");
-      exit(-1);
-    }
+  do {
+      nwritten = sendto(client_, ptr, nsize, 0, (struct sockaddr *) &server_addr_, sizeof(struct sockaddr_un));
+    } while (nwritten == -1 && errno == EINTR);
+
+  if (nwritten < 0) {
+    perror("Can't write down to socket.");
+    exit(-1);
+  }
 }

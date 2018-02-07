@@ -70,8 +70,11 @@ void UnixServer::GetRequest(std::string& request) {
   fd.events = POLLIN;
 
   socklen_t len = sizeof(struct sockaddr_un);
+  int ret = -1;
+  do {
+    ret = poll(&fd, 1, kPollTimeout);
+  } while (ret == -1 && errno == EINTR);
 
-  int ret = poll(&fd, 1, kPollTimeout);
   if (ret < 0 || fd.revents > 1) {
     perror("Socket error. poll()");
     return;
@@ -79,8 +82,11 @@ void UnixServer::GetRequest(std::string& request) {
     return;
   }
 
-  int nread = recvfrom(server_, buf, kBuffLen, 0,
-                       (struct sockaddr *) &server_addr_, &len);
+  int nread = -1;
+  do {
+    nread = recvfrom(server_, buf, kBuffLen, 0, (struct sockaddr *) &server_addr_, &len);
+   } while (nread == -1 && errno == EINTR);
+
   if (nread <= 0) {
     perror("Socket error, while receiving data from socket. recvfrom()");
     return;

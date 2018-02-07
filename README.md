@@ -25,7 +25,3 @@ systems that do not support UNIX sockets. This code is tested only on
 Linux, but most of it should be portable to BSD and Mac OS X, with
 some small changes.
 
-Note that this code reuses the same base classes in `socket.h` and `client.h`,
-showing how you can swap out a different type of socket, but the protocol
-logic and processing remains the same.
-

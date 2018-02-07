@@ -7,8 +7,7 @@
 
 #include "unix_client.h"
 
-int main(int argc, char **argv)
-{
-    UnixClient client = UnixClient("/tmp/unix_sock");
-    client.Loop();
+int main(int argc, char **argv) {
+  UnixClient client = UnixClient("/tmp/unix_sock");
+  client.Loop();
 }

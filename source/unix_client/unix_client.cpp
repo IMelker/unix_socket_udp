@@ -4,11 +4,16 @@
  *  Created on: 06 февр. 2018 г.
  *      Author: imelker
  */
+
+#include <unistd.h>
+#include <sys/socket.h>
+#include <iostream>
+
 #include "unix_client.h"
 
 UnixClient::UnixClient(const std::string& path)
-: socket_filename_(path),
-  client_(-1){
+    : socket_filename_(path),
+      client_(-1) {
   Connect();
 }
 
@@ -28,13 +33,16 @@ void UnixClient::Connect() {
     perror("Failed to initialize file descriptor for socket.");
     exit(-1);
   }
+
+  std::cout << "UNIX Client is ready to send data to " + socket_filename_
+            << std::endl;
 }
 
 void UnixClient::Loop() {
-  // read a line from standard input
+  //read line by line and send to server
   std::string line;
-  while (std::getline(std::cin,line)) {
-    if(line.compare("END")==0) {
+  while (std::getline(std::cin, line)) {
+    if (line.compare("END") == 0) {            // if END is typed => stop an app
       break;
     }
     Send(line);
@@ -44,14 +52,15 @@ void UnixClient::Loop() {
 void UnixClient::Send(const std::string& message) {
   const char* ptr = message.c_str();
   unsigned long int nsize = message.length();
-  int nwritten;
 
+  int nwritten;
   do {
-      nwritten = sendto(client_, ptr, nsize, 0, (struct sockaddr *) &server_addr_, sizeof(struct sockaddr_un));
-    } while (nwritten == -1 && errno == EINTR);
+    nwritten = sendto(client_, ptr, nsize, 0, (struct sockaddr *) &server_addr_,
+                      sizeof(struct sockaddr_un));
+  } while (nwritten == -1 && errno == EINTR);
 
   if (nwritten < 0) {
-    perror("Can't write down to socket.");
+    perror("Failed to write down to socket.");
     exit(-1);
   }
 }

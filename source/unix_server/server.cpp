@@ -7,8 +7,7 @@
 
 #include "unix_server.h"
 
-int main(int argc, char **argv)
-{
-    UnixServer server = UnixServer("/tmp/unix_sock");
-    server.Loop();
+int main(int argc, char **argv) {
+  UnixServer server = UnixServer("/tmp/unix_sock");
+  server.Loop();
 }
